@@ -126,7 +126,7 @@ onMounted(() => {
       <p v-show="coursesFilter && filteredCoursesList.length == 0" class="hint-text">如果没输错那就是该课程资料还没被收录哦～</p>
     </div>
   </div>
-  <CourseResource v-if="courseSelected" :course="courseSelected" @downloading="showMessage('下载开始，请稍后')"
+  <CourseResource v-if="courseSelected" :course="courseSelected" @downloading="showMessage('下载开始，请稍等')"
   @down-ok="async fileName => {
     let msg = `下载完成: 已将 ${fileName} 下载至 ${await downloadDir()}`;
     showMessage(msg);
