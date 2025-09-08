@@ -80,7 +80,8 @@ async function downloadFile(url: string, fileName: string) {
   });
 
   if (response.ok) {
-    await writeFile(fileName, await ((await response.blob()).bytes()), { baseDir: BaseDirectory.Download });
+    let bytes = await (await response.blob()).arrayBuffer();
+    await writeFile(fileName, new Uint8Array(bytes), { baseDir: BaseDirectory.Download });
     
     return 'ok';
   } else {
