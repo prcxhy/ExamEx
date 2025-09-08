@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { downloadDir } from '@tauri-apps/api/path'
 import { computed, inject, onMounted, ref, watch } from "vue";
 import { getCoursesMenu } from "./scripts/RepositoryAccess";
 import CourseResource from "./CourseResource.vue";
@@ -79,6 +80,13 @@ function configured(newConfig: { [key: string]: any }) {
   tagCode.value = 0;
 }
 
+const appMsg = ref('');
+
+async function showMessage(msg: string) {
+  appMsg.value = msg;
+  setTimeout(() => appMsg.value = '', 5000);
+}
+
 onMounted(() => {
   if (props.school) {
     getCoursesMenu(universityURL.value, props.school).then((courses) => {
@@ -89,6 +97,13 @@ onMounted(() => {
 </script>
 
 <template>
+  <Teleport to="body">
+    <Transition>
+      <div id="app-message" v-if="appMsg">
+        <p>{{ appMsg }}</p>
+      </div>
+    </Transition>
+  </Teleport>
   <nav>
     <div id="tags-container">
       <p :class="[tagCode == 0 ? 'course-type-tag' : 'course-type-tag-idle']" @click="tagCode = 0">{{
@@ -111,10 +126,42 @@ onMounted(() => {
       <p v-show="coursesFilter && filteredCoursesList.length == 0" class="hint-text">如果没输错那就是该课程资料还没被收录哦～</p>
     </div>
   </div>
-  <CourseResource v-if="courseSelected" :course="courseSelected" />
+  <CourseResource v-if="courseSelected" :course="courseSelected" @downloading="showMessage('下载开始，请稍后')"
+  @down-ok="async fileName => {
+    let msg = `下载完成: 已将 ${fileName} 下载至 ${await downloadDir()}`;
+    showMessage(msg);
+  }" @down-err="showMessage('下载失败，请重试')"/>
 </template>
 
 <style>
+#app-message {
+  position: relative;
+  background-color: var(--color-theme-1);
+  border-radius: 1mm;
+  border: 1px solid white;
+  font-size: 3.6mm;
+  padding: 2mm 3mm;
+  top: 3mm;
+  margin: 0px auto;
+  justify-self: center;
+  justify-items: center;
+  width: auto;
+  max-width: 10cm;
+  filter: drop-shadow(0px, 0px, 4px, var(--color-shadow-2));
+  z-index: 3;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: all 0.3s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
 nav>button {
   grid-column: -1 / -2;
 }
