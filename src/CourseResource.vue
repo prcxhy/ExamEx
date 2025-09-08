@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { getMarkdownContent, downloadFile } from './scripts/RepositoryAccess';
+// import { getMarkdownContent, downloadFile } from './scripts/RepositoryAccess';
+import { getMarkdownContent } from './scripts/RepositoryAccess';
 import IconWeb from './assets/earth.svg?component';
 import IconDownload from './assets/download.svg?component';
 import IconGithub from './assets/github.svg?component';
@@ -43,13 +44,18 @@ function accessResource(url: string, isFile: boolean) {
     if (isFile) {
         emit('downloading');
         let fileName = decodeURIComponent(url.slice(url.lastIndexOf('/') + 1));
-        downloadFile(url, fileName).then(result => {
-            if (result == 'ok') {
-                emit('down-ok', fileName);
-            } else {
-                emit('down-err');
-            }
-        });
+        // downloadFile(url, fileName).then(result => {
+        //     if (result == 'ok') {
+        //         emit('down-ok', fileName);
+        //     } else {
+            //         emit('down-err');
+            //     }
+            // });
+        let a = document.createElement('a');
+        a.href = url;
+        a.download = url.slice(url.lastIndexOf('/') + 1);
+        a.click();
+        emit('down-ok', fileName);
     } else {
         openUrl(url);
     }
