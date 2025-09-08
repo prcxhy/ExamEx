@@ -19,7 +19,8 @@
     {
       "identifier": "fs:scope",
       "allow": [
-        "$RESOURCE/**"
+        "$RESOURCE/**",
+        "$DOWNLOAD/**"
       ]
     },
     {

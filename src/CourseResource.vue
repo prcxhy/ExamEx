@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { getMarkdownContent } from './scripts/RepositoryAccess';
+import { getMarkdownContent, downloadFile } from './scripts/RepositoryAccess';
 import IconWeb from './assets/earth.svg?component';
 import IconDownload from './assets/download.svg?component';
 import IconGithub from './assets/github.svg?component';
@@ -10,13 +10,15 @@ const props = defineProps<{
   course: {name: string, url: string}
 }>()
 
-const recourses = ref();
+const resources = ref();
+
+const emit = defineEmits(['downloading', 'down-ok', 'down-err']);
 
 watch(() => props.course, newCourse => {
     // console.log(newCourse);
     getMarkdownContent(newCourse.url)
         .then((content) => {
-            recourses.value = content.split('[').flatMap(slice => {
+            resources.value = content.split('[').flatMap(slice => {
                 if (slice.includes('](')) {
                     let nameAndLink = slice.split('](');
                     let name = nameAndLink[0].trim();
@@ -33,16 +35,21 @@ watch(() => props.course, newCourse => {
                     return [];
                 }
             })
-            console.log(recourses.value);
+            // console.log(resources.value);
         });
 }, { immediate: true });
 
 function accessResource(url: string, isFile: boolean) {
     if (isFile) {
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = url.slice(url.lastIndexOf('/') + 1);
-        a.click();
+        emit('downloading');
+        let fileName = decodeURIComponent(url.slice(url.lastIndexOf('/') + 1));
+        downloadFile(url, fileName).then(result => {
+            if (result == 'ok') {
+                emit('down-ok', fileName);
+            } else {
+                emit('down-err');
+            }
+        });
     } else {
         openUrl(url);
     }
@@ -52,15 +59,15 @@ function accessResource(url: string, isFile: boolean) {
 <template>
     <div id="course-info">
         <h1>{{ props.course.name }}</h1>
-        <div id="recourse-panel">
-            <div class="recourse-card" v-for="recourse in recourses">
-                <p class="recourse-name">{{ recourse.name }}</p>
-                <p class="recourse-type">{{ recourse.type == 'dir' ? "可能包含多个文件" : recourse.type }}</p>
-                <button @click="accessResource(recourse.url, !'url/dir'.includes(recourse.type))"
-                :title="'url/dir'.includes(recourse.type) ? '访问网页' : '下载'">
-                    <IconGithub v-if="recourse.type == 'dir'"/>
-                    <IconWeb v-if="recourse.type == 'url'"/>
-                    <IconDownload v-if="!'url/dir'.includes(recourse.type)"/>
+        <div id="resource-panel">
+            <div class="resource-card" v-for="resource in resources">
+                <p class="resource-name">{{ resource.name }}</p>
+                <p class="resource-type">{{ resource.type == 'dir' ? "可能包含多个文件" : resource.type }}</p>
+                <button @click="accessResource(resource.url, !'url/dir'.includes(resource.type))"
+                :title="'url/dir'.includes(resource.type) ? '访问网页' : '下载'">
+                    <IconGithub v-if="resource.type == 'dir'"/>
+                    <IconWeb v-if="resource.type == 'url'"/>
+                    <IconDownload v-if="!'url/dir'.includes(resource.type)"/>
                 </button>
             </div>
         </div>
@@ -75,7 +82,7 @@ function accessResource(url: string, isFile: boolean) {
     overflow: hidden;
 }
 
-#recourse-panel {
+#resource-panel {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(6cm, 1fr));
     grid-auto-rows: 1fr;
@@ -83,7 +90,7 @@ function accessResource(url: string, isFile: boolean) {
     overflow: hidden auto
 }
 
-.recourse-card {
+.resource-card {
     border: 1px solid var(--color-theme-4);
     border-radius: 2mm;
     padding: 2mm 2mm 2mm 4mm;
@@ -98,13 +105,13 @@ function accessResource(url: string, isFile: boolean) {
     will-change: border;
 }
 
-.recourse-card:hover {
+.resource-card:hover {
     background-color: var(--color-theme-1);
     border: 1px solid white;
     will-change: border;
 }
 
-.recourse-card > button {
+.resource-card > button {
     grid-row: 1 / 3;
     grid-column: 2 / 3;
     height: 10mm;
@@ -112,7 +119,7 @@ function accessResource(url: string, isFile: boolean) {
     transition: 0.3s;
 }
 
-.recourse-name {
+.resource-name {
     color: var(--color-font-1);
     max-width: 45mm;
     text-overflow: ellipsis;
@@ -121,7 +128,7 @@ function accessResource(url: string, isFile: boolean) {
     font-weight: bold;
 }
 
-.recourse-type {
+.resource-type {
     color: var(--color-font-4);
     grid-column: 1 / 2;
     font-size: 4mm;
