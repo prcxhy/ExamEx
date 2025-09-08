@@ -1,3 +1,4 @@
+import { BaseDirectory, writeFile } from '@tauri-apps/plugin-fs';
 import { fetch } from '@tauri-apps/plugin-http';
 
 async function getDirList(url: string) {
@@ -73,4 +74,18 @@ async function getCoursesMenu(universityURL: string, schoolName: string) {
   return coursesMenu;
 }
 
-export { getMajorsMenu, getCoursesMenu, getMarkdownContent };
+async function downloadFile(url: string, fileName: string) {
+  const response = await fetch(url, {
+    method: 'GET',
+  });
+
+  if (response.ok) {
+    await writeFile(fileName, await response.bytes(), { baseDir: BaseDirectory.Download });
+    
+    return 'ok';
+  } else {
+    return 'err'
+  }
+}
+
+export { getMajorsMenu, getCoursesMenu, getMarkdownContent, downloadFile };

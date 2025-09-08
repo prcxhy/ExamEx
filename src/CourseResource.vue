@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { getMarkdownContent } from './scripts/RepositoryAccess';
+import { getMarkdownContent, downloadFile } from './scripts/RepositoryAccess';
 import IconWeb from './assets/earth.svg?component';
 import IconDownload from './assets/download.svg?component';
 import IconGithub from './assets/github.svg?component';
@@ -11,6 +11,8 @@ const props = defineProps<{
 }>()
 
 const resources = ref();
+
+const emit = defineEmits(['downloading', 'down-ok', 'down-err']);
 
 watch(() => props.course, newCourse => {
     // console.log(newCourse);
@@ -33,16 +35,21 @@ watch(() => props.course, newCourse => {
                     return [];
                 }
             })
-            console.log(resources.value);
+            // console.log(resources.value);
         });
 }, { immediate: true });
 
 function accessResource(url: string, isFile: boolean) {
     if (isFile) {
-        let a = document.createElement('a');
-        a.href = url;
-        a.download = url.slice(url.lastIndexOf('/') + 1);
-        a.click();
+        emit('downloading');
+        let fileName = decodeURIComponent(url.slice(url.lastIndexOf('/') + 1));
+        downloadFile(url, fileName).then(result => {
+            if (result == 'ok') {
+                emit('down-ok', fileName);
+            } else {
+                emit('down-err');
+            }
+        });
     } else {
         openUrl(url);
     }
