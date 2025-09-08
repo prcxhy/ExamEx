@@ -39,6 +39,9 @@
         },
         {
           "url": "https://api.github.com/**"
+        },
+        {
+          "url": "https://raw.githubusercontent.com/**"
         }
       ],
       "deny": [
