@@ -6,7 +6,7 @@
   (Exam Express)
 </h1>
 <h3 align="center">
-<br>课程资源共享仓库 - <a href="https://github.com/tauri-apps/tauri">华科开源计划</a>客户端
+<br>课程资源共享仓库 - <a href="https://github.com/YuhangChen1/HUST_OPEN_SOURCE">华科开源计划</a>客户端
 </h3>
 <p align="center">更扁平地访问，更方便地下载，基于<a href="https://github.com/tauri-apps/tauri">Tauri</a>开发</p>
 
