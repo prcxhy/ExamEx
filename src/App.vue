@@ -13,9 +13,9 @@ var universityName = props.university;
 
 const UNIVERSITIES = inject<{[ key: string ]: string}[]>('universities') || [];
 
-var universityURL = UNIVERSITIES.find(
+const universityURL = ref(UNIVERSITIES.find(
   (uni) => uni.name == props.university
-)?.repository || '';
+)?.repository || '');
 
 const schoolName = ref(props.school);
 
@@ -39,12 +39,30 @@ const tagCode = ref(0);
 
 watch(tagCode, newVal => {
   if (newVal == 0) {
-    getCoursesMenu(universityURL, schoolName.value).then((courses) => {
+    getCoursesMenu(universityURL.value, schoolName.value).then((courses) => {
       coursesList.value = courses;
       courseSelected.value = null;
     });
   } else {
-    getCoursesMenu(universityURL, "通识课程").then((courses) => {
+    getCoursesMenu(universityURL.value, "通识课程").then((courses) => {
+      coursesList.value = courses;
+      courseSelected.value = null;
+    });
+  }
+});
+
+watch(schoolName, newSchool => {
+  if (tagCode.value == 0) {
+    getCoursesMenu(universityURL.value, newSchool).then((courses) => {
+      coursesList.value = courses;
+      courseSelected.value = null;
+    });
+  }
+});
+
+watch(universityURL, newURL => {
+  if (tagCode.value == 1) {
+    getCoursesMenu(newURL, "通识课程").then((courses) => {
       coursesList.value = courses;
       courseSelected.value = null;
     });
@@ -54,8 +72,8 @@ watch(tagCode, newVal => {
 function configured(newConfig: { [key: string]: any }) {
   configing.value = false;
   universityName = newConfig.university;
-  universityURL = UNIVERSITIES.find(
-    (uni) => uni.name == props.university
+  universityURL.value = UNIVERSITIES.find(
+    (uni) => uni.name == universityName
   )!.repository
   schoolName.value = newConfig.school;
   tagCode.value = 0;
@@ -63,7 +81,7 @@ function configured(newConfig: { [key: string]: any }) {
 
 onMounted(() => {
   if (props.school) {
-    getCoursesMenu(universityURL, props.school).then((courses) => {
+    getCoursesMenu(universityURL.value, props.school).then((courses) => {
       coursesList.value = courses;
     });
   }
