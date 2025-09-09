@@ -23,8 +23,10 @@ watch(() => props.course, newCourse => {
                     if (type.length > 4 || type.includes('/')) {
                         type = url.startsWith('https://github.com/') ? "dir" : "url";
                     } else if (url.startsWith('https://github.com/')) {
-                        url = url.replace('https://github.com/', 'https://raw.githubusercontent.com/')
-                        .replace('/blob/', '/');
+                        // console.log(url);
+                        url = url.replace('/blob/', '/raw/');
+                        // url = url.replace('https://github.com/', 'https://raw.githubusercontent.com/')
+                        // .replace('/blob/', '/');
                     }
                     return [{ name, type, url }];
                 } else {

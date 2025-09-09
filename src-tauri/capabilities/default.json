@@ -42,7 +42,7 @@
           "url": "https://api.github.com/**"
         },
         {
-          "url": "https://raw.githubusercontent.com/**"
+          "url": "https://github.com/**"
         }
       ],
       "deny": [
