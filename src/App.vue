@@ -5,6 +5,7 @@ import { getCoursesMenu } from "./scripts/RepositoryAccess";
 import CourseResource from "./CourseResource.vue";
 import ConfigPage from "./ConfigPage.vue";
 import IconSetting from "./assets/setting.svg?component";
+import { listen } from '@tauri-apps/api/event';
 const props = defineProps<{
   university: string;
   school: string;
@@ -87,6 +88,19 @@ async function showMessage(msg: string) {
   setTimeout(() => appMsg.value = '', 5000);
 }
 
+listen('down-start', (event) => {
+  showMessage(`开始下载: ${event.payload}`);
+})
+
+listen('down-ok', async (event) => {
+  let msg = `下载完成: 已将 ${event.payload} 保存至 ${await downloadDir()}`;
+  showMessage(msg);
+})
+
+listen('down-err', (event) => {
+  showMessage(`${event.payload} 下载失败`);
+})
+
 onMounted(() => {
   if (props.school) {
     getCoursesMenu(universityURL.value, props.school).then((courses) => {
@@ -126,11 +140,7 @@ onMounted(() => {
       <p v-show="coursesFilter && filteredCoursesList.length == 0" class="hint-text">如果没输错那就是该课程资料还没被收录哦～</p>
     </div>
   </div>
-  <CourseResource v-if="courseSelected" :course="courseSelected" @downloading="showMessage('下载开始，请稍等')"
-  @down-ok="async fileName => {
-    let msg = `下载完成: 已将 ${fileName} 下载至 ${await downloadDir()}`;
-    showMessage(msg);
-  }" @down-err="showMessage('下载失败，请重试')"/>
+  <CourseResource v-if="courseSelected" :course="courseSelected" />
 </template>
 
 <style>
@@ -201,24 +211,6 @@ nav>button {
 
 .course-type-tag-idle:hover {
   opacity: 1;
-}
-
-#confirm-button {
-  background-color: rgb(146, 201, 115);
-  color: green;
-  transition: 0.3s
-}
-
-#confirm-button:enabled:hover {
-  background-color: rgb(182, 222, 158);
-}
-
-#confirm-button:enabled:active {
-  background-color: rgb(231, 254, 214);
-}
-
-#confirm-button:disabled {
-  opacity: 0.25;
 }
 
 #sidebar {
