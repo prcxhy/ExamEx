@@ -53,10 +53,10 @@ watch(repoURL, newVal => {
 }, { immediate: true });
 
 function confirm() {
-  if (filteredUniversitiesList.value.length == 1 && filteredSchoolList.value.length == 1) {
+  if (filteredUniversitiesList.value.length == 1) {
     let newConfig = {
         university: universityFilter.value,
-        school: schoolFilter.value
+        school: selected.value ? schoolFilter.value : ""
     };
     emit('configured', newConfig);
     saveJSON('config.json', newConfig);
@@ -86,7 +86,9 @@ function confirm() {
             如果没输错那就是该学院的课程还没被收录哦～
           </p>
         </div>
-        <button :disabled="!selected" @click="confirm" id="confirm-button">确认</button>
+        <button :disabled="!repoURL" @click="confirm" id="confirm-button">
+          {{ selected ? "确认" : "先看看通识课程" }}
+        </button>
     </div>
 </template>
 
@@ -97,8 +99,7 @@ function confirm() {
   height: 100%;
   background-color: var(--color-theme-3);
   display: grid;
-  /* grid-auto-rows: auto; */
-  grid-template-columns: 4.5cm 1.5cm;
+  grid-template-columns: 6cm;
   gap: 3mm;
   align-items: center;
   align-content: center;
@@ -108,17 +109,12 @@ function confirm() {
 }
 
 #config-page > h1 {
-    grid-column: 1 / 3;
     justify-self: center;
     margin: 0px;
 }
 
-#config-page > input {
-    grid-column: 1 / 3;
-}
-
 #confirm-button {
-  grid-column: 2 / 3;
+  justify-self: right;
   margin-bottom: 2cm;
   background-color: rgb(146, 201, 115);
   color: green;
@@ -139,7 +135,6 @@ function confirm() {
 
 .search-list {
   max-height: 3cm;
-  grid-column: 1 / 3;
   overflow-y: auto;
   background-color: var(--color-theme-4);
   border-radius: 2mm;

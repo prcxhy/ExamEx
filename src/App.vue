@@ -78,7 +78,7 @@ function configured(newConfig: { [key: string]: any }) {
     (uni) => uni.name == universityName
   )!.repository
   schoolName.value = newConfig.school;
-  tagCode.value = 0;
+  tagCode.value = newConfig.school ? 0 : 1;
 }
 
 const appMsg = ref('');
@@ -120,11 +120,11 @@ onMounted(() => {
   </Teleport>
   <nav>
     <div id="tags-container">
-      <p :class="[tagCode == 0 ? 'course-type-tag' : 'course-type-tag-idle']" @click="tagCode = 0">{{
+      <p v-if="schoolName" :class="[tagCode == 0 ? 'course-type-tag' : 'course-type-tag-idle']" @click="tagCode = 0">{{
         schoolName }}</p>
       <p :class="[tagCode == 1 ? 'course-type-tag' : 'course-type-tag-idle']" @click="tagCode = 1">
         通识课程</p>
-      <div id="tag-active-mark" :style="{ gridColumnStart: tagCode + 1 }"></div>
+      <div v-if="schoolName" id="tag-active-mark" :style="{ gridColumnStart: tagCode + 1 }"></div>
     </div>
     <button @click="configing = true" title="设置">
       <IconSetting />
