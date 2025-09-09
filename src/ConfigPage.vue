@@ -120,6 +120,21 @@ function confirm() {
 #confirm-button {
   grid-column: 2 / 3;
   margin-bottom: 2cm;
+  background-color: rgb(146, 201, 115);
+  color: green;
+  transition: 0.3s
+}
+
+#confirm-button:enabled:hover {
+  background-color: rgb(182, 222, 158);
+}
+
+#confirm-button:enabled:active {
+  background-color: rgb(231, 254, 214);
+}
+
+#confirm-button:disabled {
+  opacity: 0.25;
 }
 
 .search-list {
