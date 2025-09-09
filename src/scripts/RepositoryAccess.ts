@@ -1,5 +1,6 @@
 import { BaseDirectory, writeFile } from '@tauri-apps/plugin-fs';
 import { fetch } from '@tauri-apps/plugin-http';
+import { Ref } from 'vue';
 
 async function getDirList(url: string) {
   const response = await fetch(url, {
@@ -74,19 +75,37 @@ async function getCoursesMenu(universityURL: string, schoolName: string) {
   return coursesMenu;
 }
 
-async function downloadFile(url: string, fileName: string) {
+async function downloadFile(url: string, fileName: string, progress: Ref<number, number>) {
   const response = await fetch(url, {
     method: 'GET',
   });
+  const totalSize = parseInt(response.headers.get('Content-Length') || '0');
+  let loadedBytes = 0;
+  
+  let reader = response.body?.getReader();
+  let chunks = [];
 
-  if (response.ok) {
-    let bytes = await (await response.blob()).arrayBuffer();
-    await writeFile(fileName, new Uint8Array(bytes), { baseDir: BaseDirectory.Download });
+  if (reader) {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      };
+      chunks.push(value);
+      loadedBytes += value.length;
+      progress.value = (loadedBytes / totalSize) * 100;
+    }
+    if (loadedBytes == totalSize) {
+      const blob = new Blob(chunks); // 最终生成 Blob
+      const arrayBuffer = await blob.arrayBuffer(); // 如果需要 ArrayBuffer
     
-    return 'ok';
-  } else {
-    return 'err'
+      await writeFile(fileName, new Uint8Array(arrayBuffer), { baseDir: BaseDirectory.Download });
+
+      return 'ok';
+    }
   }
+  
+  return 'err';
 }
 
 export { getMajorsMenu, getCoursesMenu, getMarkdownContent, downloadFile };
