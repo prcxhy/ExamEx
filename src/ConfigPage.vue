@@ -3,6 +3,7 @@ import { openUrl } from '@tauri-apps/plugin-opener';
 import { computed, inject, ref, watch } from 'vue';
 import { getMajorsMenu } from './scripts/RepositoryAccess';
 import { saveJSON } from './scripts/Files';
+import IconGithub from './assets/github.svg?component';
 const props = defineProps<{
     config: {university: string, school: string}
 }>();
@@ -38,7 +39,7 @@ const filteredSchoolList = computed(() => {
 
 const repoURL = computed(() => {
   if (filteredUniversitiesList.value.length == 1 && filteredUniversitiesList.value[0].name == universityFilter.value) {
-    return filteredUniversitiesList.value[0].repository
+    return filteredUniversitiesList.value[0].api;
   } else {
     return '';
   }
@@ -77,7 +78,13 @@ function confirm() {
           </button>
           <h1>设 置 学 递</h1>
         </div>
-        <input v-model="universityFilter" placeholder="输入大学全称"></input>
+        <button @click="openUrl('https://github.com/prcxhy/ExamEx');">
+          <IconGithub/>&ensp;学递ExamEx
+        </button>
+        <input id="university-input" v-model="universityFilter" placeholder="输入大学全称"></input>
+        <button :disabled="!repoURL" title="查看仓库" @click="openUrl(filteredUniversitiesList[0].repository)">
+          <IconGithub/>
+        </button>
         <div class="search-list" v-if="universityFilter && !repoURL">
           <p @click="universityFilter = university.name" v-for="university in filteredUniversitiesList"
           class="search-item">
@@ -87,7 +94,7 @@ function confirm() {
             如果没输错那就是该大学的仓库还没被收录哦～
           </p>
         </div>
-        <input v-model="schoolFilter" @keyup.enter="confirm" placeholder="输入学院全称"></input>
+        <input id="school-input" v-model="schoolFilter" @keyup.enter="confirm" placeholder="输入学院全称"></input>
         <div class="search-list" v-if="schoolFilter && !selected">
           <p @click="schoolFilter = school.name" v-for="school in filteredSchoolList" class="search-item">
             {{ school.name }}
@@ -109,8 +116,8 @@ function confirm() {
   height: 100%;
   background-color: var(--color-theme-3);
   display: grid;
-  grid-template-columns: 6cm;
-  gap: 3mm;
+  grid-template-columns: 6cm 8mm;
+  gap: 3mm 0px;
   align-items: center;
   align-content: center;
   justify-content: center;
@@ -119,6 +126,7 @@ function confirm() {
 }
 
 #config-title {
+  grid-column: 1 / -1;
   justify-self: center;
 }
 
@@ -142,8 +150,7 @@ function confirm() {
 }
 
 #config-title>button:disabled {
-  background-color: rgb(160, 160, 160);
-  cursor: default;
+  background-color: rgb(128, 128, 128);
 }
 
 #config-title > h1 {
@@ -151,7 +158,39 @@ function confirm() {
     margin: 0px;
 }
 
+#config-title + button {
+  height: 5mm;
+  background-color: transparent;
+  width: auto;
+  font-size: 3.6mm;
+  grid-column: 1 / -1;
+}
+
+#config-title + button:hover {
+  opacity: 0.75;
+}
+
+#university-input {
+  grid-column: 1 / 2;
+  border-radius: 1mm 0px 0px 1mm;
+}
+
+#university-input + button {
+  background-color: var(--color-theme-2);
+  border-radius: 0px 1mm 1mm 0px;
+  transition: 0.3s;
+}
+
+#university-input + button:enabled:hover {
+  background-color: var(--color-theme-4);
+}
+
+#school-input {
+  grid-column: 1 / -1;
+}
+
 #confirm-button {
+  grid-column: 1 / -1;
   justify-self: right;
   margin-bottom: 2cm;
   background-color: rgb(146, 201, 115);
@@ -167,11 +206,8 @@ function confirm() {
   background-color: rgb(231, 254, 214);
 }
 
-#confirm-button:disabled {
-  opacity: 0.25;
-}
-
 .search-list {
+  grid-column: 1 / -1;
   max-height: 3cm;
   overflow-y: auto;
   background-color: var(--color-theme-4);

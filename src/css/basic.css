@@ -48,6 +48,11 @@ button:active {
     background-color: var(--color-shadow-2);
 }
 
+button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
 p {
     margin: 0px;
     cursor: default;

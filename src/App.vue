@@ -17,7 +17,7 @@ const UNIVERSITIES = inject<{[ key: string ]: string}[]>('universities') || [];
 
 const universityURL = ref(UNIVERSITIES.find(
   (uni) => uni.name == props.university
-)?.repository || '');
+)?.api || '');
 
 const schoolName = ref(props.school);
 
@@ -76,7 +76,7 @@ function configured(newConfig: { [key: string]: any }) {
   universityName = newConfig.university;
   universityURL.value = UNIVERSITIES.find(
     (uni) => uni.name == universityName
-  )!.repository
+  )!.api
   schoolName.value = newConfig.school;
   tagCode.value = newConfig.school ? 0 : 1;
 }

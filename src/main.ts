@@ -11,7 +11,17 @@ async function init() {
         school: ''
     });
 
-    const UNIVERSITIES: { [key: string]: string }[] = await loadJSON('universities.json', {});
+    const UNIVERSITIES = (await loadJSON('universities.json', {}) as {[key: string]: string }[])
+        .map(item => {
+            let subStrings = item.repository.slice(8).split('/');
+            subStrings[0] = 'api.github.com/repos';
+            subStrings[3] = 'contents';
+            subStrings.splice(4, 1);
+            let api = ['https:/', ...subStrings].join('/');
+
+            item.api = api;
+            return item
+        });
 
     const LAST_VERSION = await checkUpdate();
 
