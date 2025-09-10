@@ -101,11 +101,18 @@ listen('down-err', (event) => {
   showMessage(`${event.payload} 下载失败`);
 })
 
+const needUpdateVersion = ref(false);
+
 onMounted(() => {
   if (props.school) {
     getCoursesMenu(universityURL.value, props.school).then((courses) => {
       coursesList.value = courses;
     });
+  }
+  let version: {[key: string]: string} = inject('version')!;
+  if (version.current != version.last) {
+    showMessage(`检测到新版本: v${version.last}, 请前往设置下载`);
+    needUpdateVersion.value = true;
   }
 });
 </script>
@@ -120,13 +127,15 @@ onMounted(() => {
   </Teleport>
   <nav>
     <div id="tags-container">
-      <p v-if="schoolName" :class="[tagCode == 0 ? 'course-type-tag' : 'course-type-tag-idle']" @click="tagCode = 0">{{
-        schoolName }}</p>
+      <p v-if="schoolName" :class="[tagCode == 0 ? 'course-type-tag' : 'course-type-tag-idle']" @click="tagCode = 0">
+        {{ schoolName }}
+      </p>
       <p :class="[tagCode == 1 ? 'course-type-tag' : 'course-type-tag-idle']" @click="tagCode = 1">
         通识课程</p>
       <div v-if="schoolName" id="tag-active-mark" :style="{ gridColumnStart: tagCode + 1 }"></div>
     </div>
-    <button @click="configing = true" title="设置">
+    <button @click="configing = true" :title="needUpdateVersion ? '有新版本' : '设置'"
+    :class="needUpdateVersion ? 'new-version' : ''">
       <IconSetting />
     </button>
   </nav>
@@ -174,6 +183,15 @@ onMounted(() => {
 
 nav>button {
   grid-column: -1 / -2;
+}
+
+.new-version::after {
+  position: absolute;
+  top: 1.5mm;
+  right: 2.5mm;
+  content: '●';
+  color: rgb(255, 88, 88);
+  font-size: 9px;
 }
 
 #tags-container {

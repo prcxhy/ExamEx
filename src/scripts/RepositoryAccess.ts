@@ -108,4 +108,15 @@ async function downloadFile(url: string, fileName: string, progress: Ref<number,
   return 'err';
 }
 
-export { getMajorsMenu, getCoursesMenu, getMarkdownContent, downloadFile };
+async function checkUpdate() {
+  const response = await fetch('https://api.github.com/repos/prcxhy/ExamEx/releases', {
+    method: 'GET',
+  });
+
+  let lastRelease = (await response.json())[0];
+  let lastVersion = lastRelease.tag_name.split('v')[1];
+
+  return lastVersion;
+}
+
+export { getMajorsMenu, getCoursesMenu, getMarkdownContent, downloadFile, checkUpdate };

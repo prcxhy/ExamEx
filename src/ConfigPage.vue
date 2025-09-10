@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { openUrl } from '@tauri-apps/plugin-opener';
 import { computed, inject, ref, watch } from 'vue';
 import { getMajorsMenu } from './scripts/RepositoryAccess';
 import { saveJSON } from './scripts/Files';
@@ -7,6 +8,10 @@ const props = defineProps<{
 }>();
 
 const UNIVERSITIES = inject<{[ key: string ]: string}[]>('universities') || [];
+
+const VERSION = inject<{[ key: string ]: string}>('version')!;
+
+const needUpdate = computed(() => VERSION.last != VERSION.current);
 
 const emit = defineEmits(['configured']);
 
@@ -66,7 +71,12 @@ function confirm() {
 
 <template>
     <div id="config-page">
-        <h1>设 置 学 递</h1>
+        <div id="config-title">
+          <button :disabled="!needUpdate" @click="openUrl('https://github.com/prcxhy/ExamEx/releases');">
+            {{ needUpdate ? "有新版本" : 'v' + VERSION.current }}
+          </button>
+          <h1>设 置 学 递</h1>
+        </div>
         <input v-model="universityFilter" placeholder="输入大学全称"></input>
         <div class="search-list" v-if="universityFilter && !repoURL">
           <p @click="universityFilter = university.name" v-for="university in filteredUniversitiesList"
@@ -108,7 +118,35 @@ function confirm() {
   z-index: 2;
 }
 
-#config-page > h1 {
+#config-title {
+  justify-self: center;
+}
+
+#config-title>button {
+  color: white;
+  position: relative;
+  font-size: 3mm;
+  height: 5mm;
+  padding: 0px 1mm;
+  top: 1mm;
+  left: 3.6cm;
+  transition: 0.3s;
+}
+
+#config-title>button:enabled {
+  background-color: rgb(255, 88, 88);
+}
+
+#config-title>button:enabled:hover {
+  opacity: 0.75;
+}
+
+#config-title>button:disabled {
+  background-color: rgb(160, 160, 160);
+  cursor: default;
+}
+
+#config-title > h1 {
     justify-self: center;
     margin: 0px;
 }
