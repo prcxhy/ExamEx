@@ -35,9 +35,9 @@ const filteredCoursesList = computed(() => {
 
 const courseSelected = ref();
 
-const configing = ref(!props.school && !props.university);
+const configing = ref(!props.university);
 
-const tagCode = ref(0);
+const tagCode = ref(props.school ? 0 : 1);
 
 watch(tagCode, newVal => {
   if (newVal == 0) {
@@ -51,7 +51,7 @@ watch(tagCode, newVal => {
       courseSelected.value = null;
     });
   }
-});
+}, {immediate: true});
 
 watch(schoolName, newSchool => {
   if (tagCode.value == 0) {
