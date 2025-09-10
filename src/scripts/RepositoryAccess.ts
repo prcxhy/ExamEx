@@ -119,4 +119,4 @@ async function checkUpdate() {
   return lastVersion;
 }
 
-export { getMajorsMenu, getCoursesMenu, getMarkdownContent, downloadFile, checkUpdate };
+export { getDirList, getMajorsMenu, getCoursesMenu, getMarkdownContent, downloadFile, checkUpdate };
