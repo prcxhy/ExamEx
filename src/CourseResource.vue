@@ -53,7 +53,6 @@ watch(() => props.course, newCourse => {
 #resource-panel {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(6cm, 1fr));
-    grid-auto-rows: 1fr;
     gap: 2mm;
     overflow: hidden auto
 }
