@@ -90,7 +90,6 @@ function accessResource(url: string) {
     padding: 2mm;
     gap: 1mm;
     justify-content: space-between;
-    align-items: center;
     transition: 0.3s;
     will-change: border;
 }
@@ -135,6 +134,10 @@ function accessResource(url: string) {
     text-overflow: ellipsis;
     font-size: 4.2mm;
     font-weight: bold;
+    /* display: -webkit-box;            使用弹性盒子模型 */
+    /* -webkit-box-orient: vertical;    垂直排列 */
+    /* -webkit-line-clamp: 2;           限制显示行数 */
+    /* overflow: hidden; */
 }
 
 .resource-name + button {
@@ -144,6 +147,7 @@ function accessResource(url: string) {
 .progress-bar {
     background-color: var(--color-shadow-1);
     display: flex;
+    align-self: center;
     border-radius: 2px;
     margin-left: 2mm;
     width: 2cm;
@@ -166,7 +170,6 @@ function accessResource(url: string) {
 .sub-resource-panel {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-auto-rows: 1fr;
     height: 5cm;
     padding: 2mm;
     gap: 2mm;

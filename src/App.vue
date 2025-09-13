@@ -5,7 +5,9 @@ import { getCoursesMenu } from "./scripts/RepositoryAccess";
 import CourseResource from "./CourseResource.vue";
 import ConfigPage from "./ConfigPage.vue";
 import IconSetting from "./assets/setting.svg?component";
+import IconStar from "./assets/star.svg?component";
 import { listen } from '@tauri-apps/api/event';
+import { loadJSON, saveJSON } from './scripts/Files';
 const props = defineProps<{
   university: string;
   school: string;
@@ -22,6 +24,18 @@ const universityURL = ref(UNIVERSITIES.find(
 const schoolName = ref(props.school);
 
 const coursesList = ref();
+
+const favoriteList = ref<{name: string, url: string}[]>([]);
+
+function favoriteToggle(course: {name: string, url: string}) {
+  let i = favoriteList.value.findIndex(item => item.url == course.url);
+  if (i == -1) {
+    favoriteList.value.push(course);
+  } else {
+    favoriteList.value.splice(i, 1);
+  }
+  saveJSON('favorites.json', favoriteList.value);
+}
 
 const coursesFilter = ref("");
 const filteredCoursesList = computed(() => {
@@ -45,11 +59,14 @@ watch(tagCode, newVal => {
       coursesList.value = courses;
       courseSelected.value = null;
     });
-  } else {
+  } else if (newVal == 1) {
     getCoursesMenu(universityURL.value, "通识课程").then((courses) => {
       coursesList.value = courses;
       courseSelected.value = null;
     });
+  } else {
+    coursesList.value = favoriteList.value;
+    courseSelected.value = null;
   }
 }, {immediate: true});
 
@@ -114,6 +131,7 @@ onMounted(() => {
     showMessage(`检测到新版本: v${version.last}, 请前往设置下载`);
     needUpdateVersion.value = true;
   }
+  loadJSON('favorites.json', []).then(result => favoriteList.value = result);
 });
 </script>
 
@@ -132,20 +150,26 @@ onMounted(() => {
       </p>
       <p :class="[tagCode == 1 ? 'course-type-tag' : 'course-type-tag-idle']" @click="tagCode = 1">
         通识课程</p>
-      <div v-if="schoolName" id="tag-active-mark" :style="{ gridColumnStart: tagCode + 1 }"></div>
+      <p :class="[tagCode == 2 ? 'course-type-tag' : 'course-type-tag-idle']" @click="tagCode = 2">
+        收藏夹</p>
+      <div id="tag-active-mark" :style="{ gridColumnStart: schoolName ? tagCode + 1 : tagCode }"></div>
     </div>
     <button @click="configing = true" :title="needUpdateVersion ? '有新版本' : '设置'"
     :class="needUpdateVersion ? 'new-version' : ''">
-      <IconSetting />
+      <IconSetting/>
     </button>
   </nav>
   <ConfigPage v-if="configing" :config="{ university: universityName, school: schoolName }" @configured="configured" />
   <div id="sidebar">
     <input v-model="coursesFilter" placeholder="搜索课程名称"></input>
     <div id="courses-list">
-      <p v-for="course in filteredCoursesList"
-        :class="['course-banner', courseSelected == course ? 'seleced-course-banner' : '']"
-        @click="courseSelected = course">{{ course.name }}</p>
+      <div v-for="course in filteredCoursesList" @click="courseSelected = course"
+      :class="['course-banner', courseSelected == course ? 'seleced-course-banner' : '']">
+        <p>{{ course.name }}</p>
+        <button class="favorite-toggle" @click.stop="favoriteToggle(course)">
+          <IconStar :style="{fill: favoriteList.some(item => item.url == course.url) ? '#ffd500' : 'var(--color-shadow-2)'}"/>
+        </button>
+      </div>
       <p v-show="coursesFilter && filteredCoursesList.length == 0" class="hint-text">如果没输错那就是该课程资料还没被收录哦～</p>
     </div>
   </div>
@@ -196,7 +220,7 @@ nav>button {
 
 #tags-container {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto auto auto;
   grid-template-rows: auto 1mm;
   gap: 1mm 5mm;
   padding-top: 1mm;
@@ -255,6 +279,8 @@ nav>button {
 }
 
 .course-banner {
+  display: grid;
+  grid-template-columns: 1fr auto;
   background-color: var(--color-theme-2);
   border: 1px solid transparent;
   color: var(--color-font-4);
@@ -275,5 +301,22 @@ nav>button {
   border: 1px solid white;
   color: var(--color-font-1);
   font-weight: bold;
+}
+
+.favorite-toggle {
+  align-self: center;
+}
+
+.favorite-toggle:hover {
+  background-color: transparent;
+}
+
+.favorite-toggle:hover > svg {
+  opacity: 1;
+}
+
+.favorite-toggle > svg {
+  stroke-opacity: 0;
+  opacity: 0.5;
 }
 </style>
