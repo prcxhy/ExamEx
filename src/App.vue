@@ -152,7 +152,7 @@ onMounted(() => {
         通识课程</p>
       <p :class="[tagCode == 2 ? 'course-type-tag' : 'course-type-tag-idle']" @click="tagCode = 2">
         收藏夹</p>
-      <div v-if="schoolName" id="tag-active-mark" :style="{ gridColumnStart: tagCode + 1 }"></div>
+      <div id="tag-active-mark" :style="{ gridColumnStart: schoolName ? tagCode + 1 : tagCode }"></div>
     </div>
     <button @click="configing = true" :title="needUpdateVersion ? '有新版本' : '设置'"
     :class="needUpdateVersion ? 'new-version' : ''">
