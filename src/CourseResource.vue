@@ -37,7 +37,8 @@ watch(() => props.course, newCourse => {
     <div id="course-info">
         <h1>{{ props.course.name }}</h1>
         <div id="resource-panel">
-            <ResourceCard v-for="resource in resources" :name="resource.name" :type="resource.type" :url="resource.url"/>
+            <ResourceCard v-for="resource in resources" :key="resource.url"
+            :name="resource.name" :type="resource.type" :url="resource.url"/>
         </div>
     </div>
 </template>

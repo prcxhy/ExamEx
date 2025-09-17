@@ -215,7 +215,7 @@ nav>button {
   right: 2.5mm;
   content: '●';
   color: rgb(255, 88, 88);
-  font-size: 9px;
+  font-size: 2.4mm;
 }
 
 #tags-container {

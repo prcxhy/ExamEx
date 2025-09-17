@@ -85,6 +85,7 @@ function accessResource(url: string) {
 <style>
 .resource-card {
     display: grid;
+    background-color: var(--color-theme-2);
     border: 1px solid var(--color-theme-4);
     border-radius: 2mm;
     padding: 2mm;
