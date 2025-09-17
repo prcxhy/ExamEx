@@ -3,7 +3,7 @@ import App from "./App.vue";
 import { loadJSON } from "./scripts/Files";
 import { checkUpdate } from "./scripts/RepositoryAccess";
 
-const VERSION = "0.4.0";
+const VERSION = "0.4.1";
 
 async function init() {
     const CONFIG: { [key: string]: any } = await loadJSON('config.json', {
